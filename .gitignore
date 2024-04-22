@@ -1,0 +1,23 @@
+# except this file
+!.gitignore
+
+# ignore all files in this directory
+99_cover/
+01_data/
+
+# ignore all files with these extensions
+*.exe
+*.html
+*.png
+*.pdf
+*.zip
+*.do
+*.csv
+*.xlsx
+*.xls
+*.dta
+*.rds
+
+# keep folder structure
+# !/00.cover/.gitkeep
+# !*.gitkeep
