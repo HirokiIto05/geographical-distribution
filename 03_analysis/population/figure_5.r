@@ -7,25 +7,22 @@ main <- function(){
 # create plot -------------------------------------------------------------
   
   plot_for <- create_scatter(df_for,
-                             nationality = "overseas",
-                             title_x = "日本人 人口(ln)")
+                             title_x = "外国人 人口(ln)")
 
 # save plot ---------------------------------------------------------------
   
   ggsave(plot_for, filename = here::here("04_output", "figures", "figure_5.png"),
-         width = 10,
-         height = 12)
+         height = 10, width = 12)
  
 }
 
-create_scatter <-  function(input_df, 
-                            nationality,
+create_scatter <-  function(input_df,
                             title_x){
   
   plot_based_df <- input_df |> 
     dplyr::filter(!year %in% c(2013, 2014))
   
-  based_plot <- ggplot(plot_based_df,
+  output_plot <- ggplot(plot_based_df,
                        aes(x = lag_ln_total, y = ln_change_rate_total)) +
     geom_point(alpha = 0.5, colour = "#333333",
                fill = "#333333") +
@@ -59,38 +56,14 @@ create_scatter <-  function(input_df,
                 color = "#3C8DAD",
                 linewidth = 1.3) +
     facet_wrap(~ year,
-               scales = "free")
-  
-  if (nationality == "japanese") {
-    output_plot <- based_plot +
-      scale_x_continuous(breaks = c(5, 10, 15)) +
-      scale_y_continuous(breaks = c(-0.1, -0.05, 0,
-                                    0.05, 0.1),
-                         limits = c(-0.1, 0.1))
-      
-  } else if (nationality == "overseas") {
-    output_plot <- based_plot +
-      scale_x_continuous(
-        breaks = c(5, 10)) +
-      scale_y_continuous(
-        # breaks = c(-1, -0.5, 0,0.5, 1),
-        breaks = c(-2, -1, 0, 1, 2),
-        limits = c(-2, 2)
-        )
-    
-    
-  } else if (nationality == "both") {
-    output_plot <- based_plot +
-      scale_x_continuous(breaks = c(5, 10, 15),
-                         limits = c(4.5, 15.5)) +
-      scale_y_continuous(breaks = c(-1, -0.5, 0,
-                                    0.5, 1),
-                         limits = c(-1, 1))
-    
-    
-  }
+               scales = "free") +
+    scale_x_continuous(breaks = c(5, 10)) +
+    scale_y_continuous(
+      breaks = c(-2, -1, 0, 1, 2),
+      limits = c(-2, 2)
+    )
   
   return(output_plot)
 }
 
-
+main()

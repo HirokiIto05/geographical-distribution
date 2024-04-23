@@ -13,5 +13,6 @@ pacman::p_load(
     kableExtra,
     webshot2,
     patchwork,
-    cowplot
+    cowplot,
+    plyr
     )

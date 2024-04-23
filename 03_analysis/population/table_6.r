@@ -47,26 +47,6 @@ create_lm <- function(df_input, top_n) {
   
 }
 
-# X軸に総人口を用いた推定。
-create_lm_mod <- function(df_input, top_n) {
-  
-  model_output <- list(
-    "2014" = lm_robust(formula = social_rate ~ lag_ln_both, data = dplyr::filter(df_input, year == 2015)),
-    "2015" = lm_robust(formula = social_rate ~ lag_ln_both, data = dplyr::filter(df_input, year == 2016)),
-    "2016" = lm_robust(formula = social_rate ~ lag_ln_both, data = dplyr::filter(df_input, year == 2017)),
-    "2017" = lm_robust(formula = social_rate ~ lag_ln_both, data = dplyr::filter(df_input, year == 2018)),
-    "2018" = lm_robust(formula = social_rate ~ lag_ln_both, data = dplyr::filter(df_input, year == 2019)),
-    "2019" = lm_robust(formula = social_rate ~ lag_ln_both, data = dplyr::filter(df_input, year == 2020)),
-    "2020" = lm_robust(formula = social_rate ~ lag_ln_both, data = dplyr::filter(df_input, year == 2021)),
-    "2021" = lm_robust(formula = social_rate ~ lag_ln_both, data = dplyr::filter(df_input, year == 2022))
-  )
-  
-  
-  
-  return(model_output)
-  
-}
-
 
 create_model_summary <- function (model_input, title_n) {
   

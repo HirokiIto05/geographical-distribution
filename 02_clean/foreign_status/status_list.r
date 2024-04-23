@@ -1,11 +1,9 @@
 main <- function() {
   
-  df_jap <- read_df_csv("add_log_variable", "japanese")
-  df_for <- read_df_csv("add_log_variable", "overseas")
-  
   list_year <- rev(seq(2006, 2022))
   
   list_category <- purrr::map(list_year, create_list_status)
+
   
   df_status_year <- plyr::join_all(list_category,  by = "key",
                                    type = "left") |> 
@@ -16,31 +14,26 @@ main <- function() {
     dplyr::select(-key) |> 
     dplyr::slice_tail(n = 37)
   
-  save_df_xlsx(df_status_year, "foreign_status", "status_list")
+  openxlsx::write.xlsx(df_status_year, here::here("04_output", "tables", "appendix_table_2.xlsx"))
   
-  # status_kbl <-  df_status_year |> 
-  #   kbl(align = "c") |> 
-  #   kable_styling(font_size = 20)
-  # 
-  # save_kable(status_kbl, file = "03_build/foreign_status/data/status.pdf")
 }
 
 create_list_status <- function(year_n) {
 
   if (year_n < 2013) {
     file_name <- paste0(year_n, ".xls")
-    df_based <- readxl::read_xls(here::here('02_raw', 'foreign_residents', file_name),
+    df_based <- readxl::read_xls(here::here('01_data', "raw", 'foreign_residents', file_name),
                                  col_names = FALSE) |> 
       dplyr::slice(3) 
   } else if(year_n <= 2020) {
     file_name <- paste0(year_n, ".xlsx")
-    df_based <- readxl::read_xlsx(here::here('02_raw', 'foreign_residents', file_name),
+    df_based <- readxl::read_xlsx(here::here('01_data', "raw", 'foreign_residents', file_name),
                                   col_names = FALSE) |> 
       dplyr::slice(3)
   } else if(year_n >= 2021) {
     
     file_name <- paste0(year_n, ".xlsx")
-    df_based <- readxl::read_xlsx(here::here('02_raw', 'foreign_residents', file_name),
+    df_based <- readxl::read_xlsx(here::here('01_data', "raw", 'foreign_residents', file_name),
                                   col_names = FALSE) |> 
       dplyr::slice(2) 
   } 
@@ -58,3 +51,5 @@ create_list_status <- function(year_n) {
   return(df_output)
   
 }
+
+main()

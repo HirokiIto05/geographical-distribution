@@ -15,7 +15,6 @@ main <- function() {
   show_jap <- create_model_summary(model_jap, "日本人")
   
   model_for <- create_lm(df_for)
-  # model_for <- create_lm_entire_pop(df_for)
   show_for <- create_model_summary(model_for, "外国人")
   
   openxlsx::write.xlsx(show_jap, file = here::here("04_output", "tables", "table_5_japan.xlsx"))
@@ -50,34 +49,6 @@ create_lm <- function(df_input) {
   
 }
 
-create_lm_entire_pop <- function(df_input) {
-  
-  model_output <- list(
-    "2014" = lm_robust(formula = ln_change_rate_total ~  lag_ln_both, 
-                       data = dplyr::filter(df_input, year == 2015)),
-    "2015" = lm_robust(formula = ln_change_rate_total ~  lag_ln_both, 
-                       data = dplyr::filter(df_input, year == 2016)),
-    "2016" = lm_robust(formula = ln_change_rate_total ~  lag_ln_both, 
-                       data = dplyr::filter(df_input, year == 2017)),
-    "2017" = lm_robust(formula = ln_change_rate_total ~  lag_ln_both, 
-                       data = dplyr::filter(df_input, year == 2018)),
-    "2018" = lm_robust(formula = ln_change_rate_total ~  lag_ln_both, 
-                       data = dplyr::filter(df_input, year == 2019)),
-    "2019" = lm_robust(formula = ln_change_rate_total ~  lag_ln_both, 
-                       data = dplyr::filter(df_input, year == 2020)),
-    "2020" = lm_robust(formula = ln_change_rate_total ~  lag_ln_both, 
-                       data = dplyr::filter(df_input, year == 2021)),
-    "2021" = lm_robust(formula = ln_change_rate_total ~  lag_ln_both, 
-                       data = dplyr::filter(df_input, year == 2022))
-    )
-  
-  
-  
-  return(model_output)
-  
-}
-
-
 create_model_summary <- function (model_input, title_n) {
   
   gm <- tibble(
@@ -89,16 +60,12 @@ create_model_summary <- function (model_input, title_n) {
   model_based <- modelsummary::msummary(model_input, fmt = "%.4f", 
                                         estimate =  "{estimate}{stars}",
                                         stars = c('*' = .1, '**' = .05, '***' = .01),
-                                        # statistic = NULL,
                                         coef_rename = c("ln_lag_total" = "β1"),
                                         gof_map = gm,
                                         gof_omit = 'AIC|BIC|RMSE',
                                         output = "data.frame")
-                                        # output = "kableExtra")
-                                        # output = "latex")
   
   results_model <- model_based 
-    # add_header_above(c(setNames(9,title_n)))
   
   return(results_model)
   

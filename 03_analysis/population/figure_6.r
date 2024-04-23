@@ -13,7 +13,6 @@ main <- function(){
   list_plot_for <- create_scatter_plot(df_for,
                                        var_x = ln_lag_total,
                                        var_y = social_rate,
-                                       "overseas",
                                        title_x = "外国人 人口(ln)")
 
   ggsave(list_plot_for, filename = here::here("04_output", "figures", "figure_6.png"),
@@ -24,7 +23,6 @@ main <- function(){
 
 create_scatter_plot <-  function(input_df, 
                                  var_x, var_y,
-                                 nationality,
                                  title_x){
   
   var_x <- rlang::enquo(var_x)
@@ -34,7 +32,7 @@ create_scatter_plot <-  function(input_df,
   list_color_2 <- c("#333333", "#3C8DAD", "#F5A962")
   
 
-  based_plot <- ggplot(input_df,
+  output_plot <- ggplot(input_df,
                          aes(x = !!var_x, y = !!var_y)) +
     geom_point(alpha = 0.5, colour = "#333333",
                fill = "#333333") +
@@ -68,30 +66,11 @@ create_scatter_plot <-  function(input_df,
                   color = "#3C8DAD",
                   linewidth = 1.3) +
       facet_wrap(~ year,
-                 scales = "free")
-    
-  
-  
-  if (nationality == "japanese") {
-    output_plot <- based_plot +
-      scale_x_continuous(breaks = c(5, 10, 15)) 
-      # scale_y_continuous(breaks = c(-0.1, -0.05, 0,
-      #                               0.05, 0.1),
-      #                    limits = c(-0.1, 0.1))
-    
-  } else if (nationality == "overseas") {
-    output_plot <- based_plot +
+                 scales = "free") +
       scale_x_continuous(breaks = c(5, 10)) +
-    scale_y_continuous(limits = c(-50, 50))
-    
-  } else if (nationality == "both") {
-    output_plot <- based_plot +
-      scale_x_continuous(breaks = c(5, 10, 15),
-                         limits = c(5, 15.5)) +
       scale_y_continuous(limits = c(-50, 50))
-    
-  }
   
   return(output_plot)
 }
 
+main()

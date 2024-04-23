@@ -3,7 +3,7 @@
 
 # ignore all files in this directory
 99_cover/
-01_data/
+01_data/raw/geometry_data/
 
 # ignore all files with these extensions
 *.exe
@@ -11,7 +11,6 @@
 *.png
 *.pdf
 *.zip
-*.do
 *.csv
 *.xlsx
 *.xls
