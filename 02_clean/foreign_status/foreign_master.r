@@ -8,13 +8,9 @@ main <- function() {
     dplyr::filter(year >= 2010)
 
   df_pop <- read_population_data()
-
-  # df_status |> View()
   
   df_joint <- df_code |> 
     dplyr::left_join(df_status) 
-    # dplyr::left_join(df_pop, by = c("year", 
-    #                                 "prefecture_name"))
   
   df_master <- add_log_var(df_joint) |> 
     dplyr::ungroup()
@@ -168,17 +164,7 @@ add_log_var <- function(df_input) {
       ln_change_rate_except_specific_5 = ln_except_specific - lag_ln_except_specific_5,
       ln_change_rate_except_specific_10 = ln_except_specific - lag_ln_except_specific_10,
       .after = ln_change_rate_except_specific_5
-    ) # |>
-    # dplyr::mutate(
-    #   lag_ln_total = dplyr::lag(ln_total),
-    #   lag_ln_total_2 = dplyr::lag(ln_total, n = 2),
-    #   lag_ln_total_3 = dplyr::lag(ln_total, n = 3),
-    #   lag_ln_total_5 = dplyr::lag(ln_total, n = 5),
-    #   lag_ln_total_10 = dplyr::lag(ln_total, n = 10),
-    #   .after = ln_total
-    # )
-  
-    
+    ) 
   
   return(df_based)
   
