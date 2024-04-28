@@ -62,11 +62,3 @@ create_stats_table <- function(df_master){
 
 
 main()
-  
-
-  
-
-
-
-write.csv(df_long, file = "00_cover/00.pre_report/statistic_table.csv")
-

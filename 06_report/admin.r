@@ -29,6 +29,7 @@ source(here::here("03_analysis", "population", "applendix_figure_3.r"))
 # 「在留外国人統計」関連分析
 source(here::here("03_analysis", "foreign_status", "figure_7.r"))
 source(here::here("03_analysis", "foreign_status", "figure_8.r"))
-source(here::here("03_analysis", "foreign_status", "table_5.r"))
+source(here::here("03_analysis", "foreign_status", "table_7.r"))
+source(here::here("03_analysis", "foreign_status", "table_8.r"))
 source(here::here("03_analysis", "foreign_status", "appendix_table3.r"))
 

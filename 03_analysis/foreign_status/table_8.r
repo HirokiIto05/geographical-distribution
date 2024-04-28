@@ -141,5 +141,4 @@ adjust_table <- function(df_base, title_n){
 }
 
 
-
 main()

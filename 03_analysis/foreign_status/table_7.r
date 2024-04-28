@@ -146,4 +146,4 @@ lm_five_except <- function(df_input) {
   return(list_output)
 }
 
-
+main()
