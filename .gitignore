@@ -3,7 +3,6 @@
 
 # ignore all files in this directory
 99_other/
-01_data/raw/geometry_data/
 
 # ignore all files with these extensions
 *.exe

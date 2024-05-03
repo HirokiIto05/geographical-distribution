@@ -8,8 +8,10 @@
   model_low <- estimate_training(df_master) 
   model_status_total <- estimate_status(df_master)
 
-  table_high <- create_lm_table(model_high, "高技能資格者", 4)
-  table_low <- create_lm_table(model_low, "技能実習・特定技能　合計", 4)
+  table_high <- create_lm_table(model_high, "高技能資格者", 4) |>
+    dplyr::filter(statistic != "N")
+  table_low <- create_lm_table(model_low, "技能実習・特定技能　合計", 4) |>
+    dplyr::filter(statistic != "N")
   table_status <- create_lm_table(model_status_total, "身分系資格者（特別永住者含む）　合計", 4)
 
   table_output <- table_high |>
@@ -73,6 +75,8 @@ estimate_status <- function(df_input) {
 }
 
 
+model_input <- model_high
+
 create_lm_table <- function (model_input, title_n, col_n) {
   
   gm <- tibble(
@@ -88,8 +92,7 @@ create_lm_table <- function (model_input, title_n, col_n) {
                                         gof_map = gm,
                                         output = "data.frame") 
 
-
-  results_model <- adjust_table(df_base, title_n)
+  results_model <- adjust_table(df_estimates, title_n)
 
   return(results_model)
 }
@@ -116,7 +119,6 @@ adjust_table <- function(df_base, title_n){
             statistic = term
         ) |>
         dplyr::select(-term)
-
 
     df_coef <- df_base |>
         dplyr::filter(

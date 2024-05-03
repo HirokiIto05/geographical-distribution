@@ -1,3 +1,5 @@
+appid <- "12604ebf628834b46b3867721893644141fe9a34"
+
 pacman::p_load(
     dplyr, 
     tidyr, 
@@ -14,5 +16,6 @@ pacman::p_load(
     webshot2,
     patchwork,
     cowplot,
-    plyr
+    plyr,
+    estatapi
     )
