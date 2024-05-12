@@ -1,14 +1,13 @@
 main <- function(){
 
-# load data ---------------------------------------------------------------
+  # load data ---------------------------------------------------------------
   
   df_jap <- read.csv(here::here("01_data", "intermediate", "population", "japanese.csv"), fileEncoding = "cp932")
   df_for <- read.csv(here::here("01_data", "intermediate", "population", "overseas.csv"), fileEncoding = "cp932")
-  df_both <- read.csv(here::here("01_data", "intermediate", "population", "both.csv"), fileEncoding = "cp932")
   
 
-# 市町村合併データ ----------------------------------------------------------------
-  adjust_df <- readxl::read_xlsx("01_data/raw/municipality_converter/municipality_converter_jp.xlsx")
+  # 市町村合併データ ----------------------------------------------------------------
+  adjust_df <- readxl::read_xlsx(here::here("01_data", "raw", "municipality_converter", "municipality_converter_jp.xlsx"))
   
   df_city_id_2020 <- adjust_df |> 
     dplyr::distinct(id_muni2020) |> 
@@ -42,23 +41,17 @@ main <- function(){
   
   df_adjusted_for <- purrr::map(list_2020_id, adjust_city_id, df_for, adjust_df) |> 
     dplyr::bind_rows()
-  
-  df_adjusted_both <- purrr::map(list_2020_id, adjust_city_id, df_both, adjust_df) |> 
-    dplyr::bind_rows()
-  
-  # time_test(df_both, current_cityid_list, adjust_df)  
-  
+   
   # 対数と変化率の追加
-  df_jap_output <- add_variabels(df_adjusted_jap, df_name_id)
-  df_for_output <- add_variabels(df_adjusted_for, df_name_id)
-  df_both_output <- add_variabels(df_adjusted_both, df_name_id)
+  df_jap_output <- df_adjusted_jap |>
+    dplyr::left_join(df_name_id)
+
+  df_for_output <- df_adjusted_for |>
+    dplyr::left_join(df_name_id)
 
   # データの保存
   write.csv(df_jap_output, here::here("01_data", "intermediate", "population", "japanese_adjusted.csv"), fileEncoding = "cp932", row.names = FALSE)
   write.csv(df_for_output, here::here("01_data", "intermediate", "population", "overseas_adjusted.csv"), fileEncoding = "cp932", row.names = FALSE)
-  write.csv(df_both_output, here::here("01_data", "intermediate", "population", "both_adjusted.csv"), fileEncoding = "cp932", row.names = FALSE)
-  
-  
 
 }
 
@@ -131,28 +124,4 @@ adjust_city_id <- function(id_n, df_pop, adjust_df){
 }
 
 
-add_variabels <- function(df_input, df_name_id) {
-
-  df_output <- df_input |> 
-    dplyr::left_join(
-      df_name_id
-    ) |> 
-    dplyr::group_by(city_id) |> 
-    dplyr::mutate(lag_total = dplyr::lag(total), .after = total) |> 
-    dplyr::mutate(change_rate = change/dplyr::lag(total)*100, .after = change) |> 
-    dplyr::mutate(natural_rate = natural/dplyr::lag(total)*100, .after = natural) |> 
-    dplyr::mutate(social_rate = (social/dplyr::lag(total))*100, .after = social) |> 
-    dplyr::select(
-      city_id,
-      city_name,
-      prefecture_name,
-      year,
-      dplyr::everything()
-    )
-  
-  return(df_output)
-}
-
-
 main()
-

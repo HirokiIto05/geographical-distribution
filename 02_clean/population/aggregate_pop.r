@@ -6,7 +6,6 @@ main <- function() {
   year_list <- seq(2013, 2022)
   
   non_numeric_variables <- c("prefecture_name", "city_name")
-  
 
   # clean data ---------------------------------------------------------------------
   # Japanese
@@ -35,24 +34,9 @@ main <- function() {
     tidyr::drop_na(city_id) |> 
     dplyr::select(-c(change_rate, natural_rate, social_rate)) 
   
-　
-  # Japanese & Foreigners
-  df_both <- purrr::map(year_list,
-                        aggregate_pop,
-                        list_colname = list_colname,
-                        nationality = "both") |>
-    dplyr::bind_rows() |>
-    dplyr::mutate(dplyr::across(-dplyr::any_of(non_numeric_variables), as.numeric)) |>
-    dplyr::mutate(nationality = "both",
-                  .after = city_name) |>
-    dplyr::mutate(city_id = stringr::str_sub(city_id, start = 1, end = -2)) |>
-    tidyr::drop_na(city_id) |> 
-    dplyr::select(-c(change_rate, natural_rate, social_rate))
-  
   # save -----------------------------------------------------------------
   write.csv(df_jap, here::here("01_data", "intermediate", "population", "japanese.csv"), fileEncoding = "cp932", row.names = FALSE)
   write.csv(df_for, here::here("01_data", "intermediate", "population", "overseas.csv"), fileEncoding = "cp932", row.names = FALSE)
-  write.csv(df_both, here::here("01_data", "intermediate", "population", "both.csv"), fileEncoding = "cp932", row.names = FALSE)
   
 }
 
@@ -199,5 +183,6 @@ aggregate_pop <- function(year_n, list_colname, nationality) {
   return(output_df)
   
 }
+
 
 main()

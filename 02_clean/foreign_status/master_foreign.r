@@ -1,65 +1,18 @@
 main <- function() {
   
-  # 都道府県コードとidを読み込む
-  df_code <- read_code()
-  
-  df_status <- read.csv(here::here("01_data", "intermediate", "foreign_status", "foreign_classified.csv"), fileEncoding = "cp932") |> 
+  df_status <- read.csv(here::here("01_data", "intermediate", "foreign_status", "foreign_status.csv"), fileEncoding = "cp932") |> 
     dplyr::ungroup() |> 
     dplyr::filter(year >= 2010)
-
-  df_pop <- read_population_data()
   
-  df_joint <- df_code |> 
-    dplyr::left_join(df_status) 
-  
-  df_master <- add_log_var(df_joint) |> 
+  df_master <- add_log_variables(df_status) |> 
     dplyr::ungroup()
-    
+
   write.csv(df_master, here::here("01_data", "intermediate", "foreign_status", "master.csv"), fileEncoding = "cp932", row.names = FALSE)
   
 }
 
 
-read_code <- function() {
-  
-  df_code <- readxl::read_xls(here::here("01_data", "raw", "municipality_code", "municipality_code.xls"), col_names = FALSE) |> 
-    dplyr::select(1, 2, 3)
-  
-  colnames(df_code) <- c("id", "prefecture_name", "city_name") 
-  
-  df_output <- df_code |> 
-    dplyr::filter(is.na(city_name)) |> 
-    dplyr::mutate(id = str_sub(id, start = 1, end = -2),
-                  id = as.numeric(id)) |> 
-    dplyr::select(-city_name) |> 
-    dplyr::mutate(prefecture_name = str_replace_all(prefecture_name, "県", "")) |> 
-    dplyr::mutate(prefecture_name = str_replace_all(prefecture_name, "府", "")) |> 
-    dplyr::mutate(prefecture_name = str_replace_all(prefecture_name, "東京都", "東京"))
-  
-  return(df_output)
-  
-  
-}
-
-
-read_population_data <- function() {
-  
-  df_pop <- read.csv(here::here("01_data", "intermediate", "foreign_status", "both_for_foreign_status.csv"), fileEncoding = "cp932") |> 
-    dplyr::mutate(prefecture_name = stringr::str_replace_all(prefecture_name, "県", "")) |> 
-    dplyr::mutate(prefecture_name = stringr::str_replace_all(prefecture_name, "府", "")) |> 
-    dplyr::mutate(prefecture_name = stringr::str_replace_all(prefecture_name, "東京都", "東京")) |> 
-    dplyr::select(
-      prefecture_name,
-      year,
-      total) |> 
-    dplyr::mutate(
-      ln_total = log(total)) 
-  
-  return(df_pop)
-  
-}
-
-add_log_var <- function(df_input) {
+add_log_variables <- function(df_input) {
   
   df_based <- df_input |> 
     dplyr::group_by(prefecture_name) |> 
@@ -164,10 +117,12 @@ add_log_var <- function(df_input) {
       ln_change_rate_except_specific_5 = ln_except_specific - lag_ln_except_specific_5,
       ln_change_rate_except_specific_10 = ln_except_specific - lag_ln_except_specific_10,
       .after = ln_change_rate_except_specific_5
-    ) 
+    ) |>
+    dplyr::ungroup()
   
   return(df_based)
   
 }
+
 
 main()

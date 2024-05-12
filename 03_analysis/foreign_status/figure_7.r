@@ -19,15 +19,13 @@ modify_dataset <- function(df_master){
 
   df_based <- df_master |> 
     dplyr::filter(year %in% seq(2010,2022, 2)) |> 
-    dplyr::ungroup() |> 
-    dplyr::group_by(year) |> 
-    summarise(total = sum(total_foreign, na.rm = TRUE),
+    dplyr::summarise(total = sum(total_foreign, na.rm = TRUE),
               high_skill = sum(high_skill, na.rm = TRUE),  
               low_skill = sum(low_skill, na.rm = TRUE),  
               # training = sum(training, na.rm = TRUE),
               status = sum(status, na.rm = TRUE),
               specific_residents = sum(specific_permanent_resident, na.rm = TRUE),
-              other = sum(other, na.rm = TRUE)) |> 
+              other = sum(other, na.rm = TRUE), .by = year) |>
     dplyr::mutate_at(vars(-year), round) |> 
     dplyr::mutate(total_rate = round((total/total)*100, digits = 1), .after = total) |> 
     dplyr::mutate(high_skill_rate = round((high_skill/total)*100, digits = 1), .after = high_skill) |> 
@@ -114,5 +112,6 @@ generate_cumulative_plot <- function(df_plot_based){
 
   return(plot_output)
 }
+
 
 main()

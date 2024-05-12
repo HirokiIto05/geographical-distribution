@@ -5,17 +5,13 @@ source(here::here("05_config", "library.r"))
 # Clean -----------------------------------------
 
 # 「住民基本台帳」関連分析
-source(here::here("02_clean", "population", "aggregate_pop.r"))
-source(here::here("02_clean", "population", "mini_id_adjusted.r"))
-source(here::here("02_clean", "population", "master.r"))
+source(here::here("02_clean", "population", "aggregate_pop.r")) # create panel data
+source(here::here("02_clean", "population", "mini_id_adjusted.r")) # adjust municipality id
+source(here::here("02_clean", "population", "master_pop.r")) 
 
 # 「在留外国人統計」関連分析
-source(here::here("02_clean", "foreign_status", "aggregate_pop_for_foreign_status.r"))
-source(here::here("02_clean", "foreign_status", "city_to_prefecture.r"))
-source(here::here("02_clean", "foreign_status", "status_year.r"))
-source(here::here("02_clean", "foreign_status", "foreign_master.r"))
-# source(here::here("02_clean", "foreign_status", ".r"))
-
+source(here::here("02_clean", "foreign_status", "aggregate_status.r"))
+source(here::here("02_clean", "foreign_status", "master_foreign.r"))
 
 # Analyze ---------------------------------------
 

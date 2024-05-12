@@ -1,6 +1,7 @@
 main <- function() {
   
   # generate constants ---------------------------------------------------------------------
+  # 年ごとに在留区分が変わるため列名を分けている
   l_col_1 <- create_list_06_09()
   l_col_2 <- create_list_10_11()
   l_col_3 <- create_list_12_14()
@@ -8,20 +9,21 @@ main <- function() {
   l_col_5 <- create_list_17_18()
   l_col_6 <- create_list_19_22()
   
-  list_cols <- list("year_06_09" = l_col_1,
-                    "year_10_11" = l_col_2,
-                    "year_12_14" = l_col_3,
-                    "year_15_16" = l_col_4,
-                    "year_17_18" = l_col_5,
-                    "year_19_22" = l_col_6)
+  list_cols <- list(
+    "year_06_09" = l_col_1,
+    "year_10_11" = l_col_2,
+    "year_12_14" = l_col_3,
+    "year_15_16" = l_col_4,
+    "year_17_18" = l_col_5,
+    "year_19_22" = l_col_6
+    )
   
   list_year <- rev(seq(2010, 2022))
   
-  list_prefecture_name <- readxl::read_xls("01_data/raw/prefecture_code_name/prefecture_data.xls") |> 
-    dplyr::select(2) |> 
-    dplyr::distinct() |> 
+  list_prefecture_name <- readxl::read_xls(here::here("01_data", "raw", "prefecture_code_name", "prefecture_data.xls")) |> 
+    dplyr::distinct(!!rlang::sym("都道府県名\n（漢字）")) |> 
     dplyr::pull()
-  
+
   df_foreign <- purrr::map(list_year, create_df_foreign, list_cols,
                            list_prefecture_name) |> 
     dplyr::bind_rows() |> 
@@ -30,10 +32,10 @@ main <- function() {
     dplyr::filter(!prefecture_name  %in% c("第５表　都道別　在留資格別　在留外国人　（総　数）",
                                            "総数",
                                            "第５表　都道府県別　在留資格別　在留外国人　（総　数）"))
+
+  df_foreign <- streamline_status(df_foreign)
   
   write.csv(df_foreign, here::here("01_data", "intermediate", "foreign_status", "foreign_status.csv"), fileEncoding = "cp932", row.names = FALSE)
-  openxlsx::write.xlsx(df_foreign, here::here("01_data", "intermediate", "foreign_status", "foreign_status.xlsx"))
-  
 }
 
 
@@ -105,7 +107,7 @@ create_df_foreign <- function(year_n, list_cols, list_prefecture_name) {
       dplyr::select(-1)
     
     colnames(df_based) <- c("prefecture_name", list_cols[["year_19_22"]])
-    
+
   df_based <- df_based |> 
     dplyr::filter(prefecture_name %in% list_prefecture_name) |> 
     dplyr::mutate(prefecture_name = stringr::str_replace_all(prefecture_name, "県", "")) |> 
@@ -373,7 +375,9 @@ create_list_19_22 <- function() {
 
 create_status_jap <- function(df_foreign) {
   
-  df_status_eng <- tibble(eng = colnames(df_foreign)) |> 
+  df_status_eng <- dplyr::tibble(
+    eng = colnames(df_foreign)
+    ) |> 
     dplyr::mutate(id = row_number(), .before = eng)
   
   list_status_jap <- c("prefecture_name",
@@ -433,11 +437,90 @@ create_status_jap <- function(df_foreign) {
   return(df_output)
   
 }
+
+
+streamline_status <- function(df_foreign) {
   
+  # 「技術」と「人文知識・国際業務」を統合
+  #「経営・管理」と「投資・経営」
+  df_based <- df_foreign |> 
+    dplyr::group_by(prefecture_name, year) |>  
+    dplyr::mutate(Engineer_or_Specialist_in_Humanities_or_International_Services = 
+                    if_else(is.na(Engineer), 
+                            Engineer_or_Specialist_in_Humanities_or_International_Services,
+                            sum(Engineer, Specialist_in_Humanities_or_International_Services, na.rm = TRUE))) |> 
+    dplyr::select(-Engineer, -Specialist_in_Humanities_or_International_Services) |> 
+    dplyr::mutate(Business_Manager = 
+                    if_else(is.na(Investor_or_Business_Manager), 
+                            Business_Manager,
+                            Investor_or_Business_Manager)) |> 
+    dplyr::select(-Investor_or_Business_Manager) |>
+    dplyr::ungroup()
   
+
+  df_except <- df_based |> 
+    dplyr::select(-Total)
+  
+  # 区分に分けて合計を算出
+  df_output <- df_based |> 
+    dplyr::summarise(total_foreign = 
+                       Total,
+                     high_skill = 
+                       sum(Professor,
+                           Art,
+                           Religion,
+                           Report,
+                           Highly_Skilled_Professional_1_a,
+                           Highly_Skilled_Professional_1_b,
+                           Highly_Skilled_Professional_1_c,
+                           Highly_Skilled_Professional_2,
+                           Business_Manager,
+                           Legal_and_Accounting_Services,
+                           Medical_Services,
+                           Research,
+                           Educate,
+                           Engineer_or_Specialist_in_Humanities_or_International_Services,
+                           Intra_Company_Transferee,
+                           Nursing_Care,
+                           Skill, na.rm = TRUE),
+                     low_skill =
+                       sum(Specified_Skilled_Worker_1,
+                           Specified_Skilled_Worker_2,
+                           Technical_Intern_Training_1_a,
+                           Technical_Intern_Training_1_b,
+                           Technical_Intern_Training_2_a,
+                           Technical_Intern_Training_2_b,
+                           Technical_Intern_Training_3_a,
+                           Technical_Intern_Training_3_b, na.rm = TRUE),
+                     training =
+                       sum(Technical_Intern_Training_1_a,
+                           Technical_Intern_Training_1_b,
+                           Technical_Intern_Training_2_a,
+                           Technical_Intern_Training_2_b,
+                           Technical_Intern_Training_3_a,
+                           Technical_Intern_Training_3_b, na.rm = TRUE),
+                     status =
+                       sum(Permanent_Resident,
+                           Spouse_or_Child_of_Japanese_National,
+                           Spouse_or_Child_of_Permanent_Resident,
+                           Long_Term_Resident, na.rm = TRUE),
+                     specific_permanent_resident = Specific_Permanent_Resident,
+                     other = sum(Unacquired, 
+                                 Student, 
+                                 Temporary_Protect,
+                                 Entertainer,
+                                 Cultural_Activities,
+                                 Trainee, 
+                                 Designated_Activities,
+                                 Dependent,
+                                 Other, 
+                                 Temporary_Visitor, na.rm = TRUE),
+                                 .by = c("prefecture_name", "year")) |> 
+    dplyr::mutate(except_specific = total_foreign - specific_permanent_resident)
+
+  return(df_output)
+  
+}
+
 
 main()
-
-
-
-

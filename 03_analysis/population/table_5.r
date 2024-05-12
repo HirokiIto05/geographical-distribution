@@ -16,7 +16,7 @@ main <- function() {
   
   model_for <- create_lm(df_for)
   show_for <- create_model_summary(model_for, "外国人")
-  
+
   openxlsx::write.xlsx(show_jap, file = here::here("04_output", "tables", "table_5_japan.xlsx"))
   openxlsx::write.xlsx(show_for, file = here::here("04_output", "tables", "table_5_foreign.xlsx"))
   

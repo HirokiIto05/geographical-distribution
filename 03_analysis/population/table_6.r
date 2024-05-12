@@ -7,11 +7,9 @@ main <- function() {
   df_for <- read.csv(here::here("01_data", "intermediate", "population", "overseas_master.csv"),  fileEncoding = "cp932") |> 
     dplyr::ungroup() |> 
     dplyr::filter(year != 2013) |> 
-    # dplyr::mutate(ln_lag_total = log(lag_total), .after = lag_total) |> 
     dplyr::filter(lag_ln_total > -Inf) |> 
     dplyr::filter(social_rate > -50 & social_rate < 50) |> 
-    relocate(ln_total, .after = total)
-  
+    relocate(ln_total, .after = total)  
   
   model_jap <- create_lm(df_jap)
   model_for <- create_lm(df_for)
@@ -19,12 +17,9 @@ main <- function() {
   show_jap <- create_model_summary(model_jap, "日本人")
   show_for <- create_model_summary(model_for, "外国人(X軸外国人人口)")
   
-  
   # エクセル形式での保存
   write.xlsx(show_jap, file = here::here("04_output", "tables", "table_6_japanese.xlsx"))
   write.xlsx(show_for, file = here::here("04_output", "tables", "table_6_foreign.xlsx"))
-  
-  
 }
 
 
@@ -63,11 +58,8 @@ create_model_summary <- function (model_input, title_n) {
                                         gof_map = gm,
                                         gof_omit = 'AIC|BIC|RMSE',
                                         output = "data.frame")
-                                        # output = "latex")
-                                        # output = "kableExtra")
   
   results_model <- model_based
-  #   add_header_above(c(setNames(9,title_n)))
   
   return(results_model)
   
