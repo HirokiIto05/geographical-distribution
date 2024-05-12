@@ -75,8 +75,6 @@ estimate_status <- function(df_input) {
 }
 
 
-model_input <- model_high
-
 create_lm_table <- function (model_input, title_n, col_n) {
   
   gm <- tibble(
@@ -98,7 +96,7 @@ create_lm_table <- function (model_input, title_n, col_n) {
 }
 
 
-adjust_table <- function(df_base, title_n){
+adjust_table <- function(df_estimates, title_n){
 
     df_base <- df_estimates |>
       dplyr::filter(

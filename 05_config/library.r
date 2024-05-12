@@ -17,5 +17,5 @@ pacman::p_load(
     patchwork,
     cowplot,
     plyr,
-    estatapi
+    broom
     )

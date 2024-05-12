@@ -18,7 +18,7 @@ main <- function() {
   table_adjusted <- table_total_three |>
     dplyr::bind_rows(table_except_three)
 
-  write.xlsx(table_adjusted, file = here::here("04_output", "tables", "figure_7.xlsx"))
+  write.xlsx(table_adjusted, file = here::here("04_output", "tables", "table_7.xlsx"))
 
 
   # 5 years
