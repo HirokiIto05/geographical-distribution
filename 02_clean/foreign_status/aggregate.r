@@ -18,102 +18,80 @@ main <- function() {
     "year_19_22" = l_col_6
     )
   
-  df_filenames <- dplyr::tribble(
-    ~"year", ~"file_name",
-    "2010", "10-99-04-0.xls",
-    "2011", "11-99-04-0.xls",
-    "2012", "12-12-05-0.xls",
-    "2013", "13-12-05-0.xlsx",
-    "2014", "14-12-05-0.xlsx",
-    "2015", "15-12-05-0.xlsx",
-    "2016", "16-12-05-0.xlsx",
-    "2017", "17-12-05-0.xlsx",
-    "2018", "18-12-05-0.xlsx",
-    "2019", "19-12-05.xlsx",
-    "2020", "20-12-05.xlsx",
-    "2021", "21-12-03-2.xlsx",
-    "2022", "22-06-03-1 .xlsx" # 2022年のみ6月
-  )
-  
-  # 2010 - 2021(Dec), 2022(Jun)
   list_year <- rev(seq(2010, 2022))
-
+  
   list_prefecture_name <- readxl::read_xls(here::here("01_data", "raw", "prefecture_code_name", "prefecture_data.xls")) |> 
     dplyr::distinct(!!rlang::sym("都道府県名\n（漢字）")) |> 
     dplyr::pull()
 
   df_foreign <- purrr::map(list_year, create_df_foreign, list_cols,
-                           list_prefecture_name, df_filenames) |> 
+                           list_prefecture_name) |> 
     dplyr::bind_rows() |> 
     dplyr::mutate_all(~stringr::str_replace_all(., "-", "0")) |> 
     dplyr::mutate_at(dplyr::vars(-prefecture_name), as.numeric) |> 
     dplyr::filter(!prefecture_name  %in% c("第５表　都道別　在留資格別　在留外国人　（総　数）",
                                            "総数",
-                                           "第５表　都道府県別　在留資格別　在留外国人　（総　数）",
-                                           "未定・不詳",
-                                           "未定・不祥"))
+                                           "第５表　都道府県別　在留資格別　在留外国人　（総　数）"))
 
   df_foreign <- streamline_status(df_foreign)
   
   write.csv(df_foreign, here::here("01_data", "intermediate", "foreign_status", "foreign_status.csv"), fileEncoding = "cp932", row.names = FALSE)
 }
 
-create_df_foreign <- function(year_n, list_cols, list_prefecture_name, df_filenames) {
-  print(year_n)
 
-  file_name <- df_filenames |>
-    dplyr::filter(year == year_n) |>
-    dplyr::pull(file_name)
+create_df_foreign <- function(year_n, list_cols, list_prefecture_name) {
+  print(year_n)
   
   if(year_n <= 2010) {
-
-    df_based <- readxl::read_xls(here::here("01_data", "raw", "foreign_residents", file_name),
+    
+    file_name <- paste0(year_n, ".xls")
+    df_based <- readxl::read_xls(paste0("01_data/raw/foreign_residents/", file_name),
                                  col_names = FALSE) |> 
       dplyr::select(-1)
     
     colnames(df_based) <- c("prefecture_name", list_cols[["year_10_11"]])
     
   } else if (year_n <= 2011) {
-
-    df_based <- readxl::read_xls(here::here("01_data", "raw", "foreign_residents", file_name),
+    file_name <- paste0(year_n, ".xls")
+    df_based <- readxl::read_xls(paste0("01_data/raw/foreign_residents/", file_name),
                                  col_names = FALSE) |> 
       dplyr::select(-1) 
     
     colnames(df_based) <- c("prefecture_name", list_cols[["year_10_11"]])
     
   } else if (year_n <= 2012) {
-
-      df_based <- readxl::read_xls(here::here("01_data", "raw", "foreign_residents", file_name),
+      file_name <- paste0(year_n, ".xls")
+      df_based <- readxl::read_xls(paste0("01_data/raw/foreign_residents/", file_name),
                                    col_names = FALSE) |> 
         dplyr::select(-1)
       
       colnames(df_based) <- c("prefecture_name", list_cols[["year_12_14"]])
   } else if (year_n <= 2014) {
-
-    df_based <- readxl::read_xlsx(here::here("01_data", "raw", "foreign_residents", file_name),
+    file_name <- paste0(year_n, ".xlsx")
+    df_based <- readxl::read_xlsx(paste0("01_data/raw/foreign_residents/", file_name),
                       col_names = FALSE) |> 
       dplyr::select(-1)
     
     colnames(df_based) <- c("prefecture_name", list_cols[["year_12_14"]])
   } else if (year_n <= 2016) {
-
-    df_based <- readxl::read_xlsx(here::here("01_data", "raw", "foreign_residents", file_name),
+    file_name <- paste0(year_n, ".xlsx")
+    df_based <- readxl::read_xlsx(paste0("01_data/raw/foreign_residents/", file_name),
                       col_names = FALSE) |> 
       dplyr::select(-1)
     
     colnames(df_based) <- c("prefecture_name", list_cols[["year_15_16"]])
     
   } else if (year_n <= 2018) {
-
-    df_based <- readxl::read_xlsx(here::here("01_data", "raw", "foreign_residents", file_name),
+    file_name <- paste0(year_n, ".xlsx")
+    df_based <- readxl::read_xlsx(paste0("01_data/raw/foreign_residents/", file_name),
                       col_names = FALSE) |> 
       dplyr::select(-1)
     
     colnames(df_based) <- c("prefecture_name", list_cols[["year_17_18"]])
     
   } else if (year_n <= 2020) {
-
-    df_based <- readxl::read_xlsx(here::here("01_data", "raw", "foreign_residents", file_name),
+    file_name <- paste0(year_n, ".xlsx")
+    df_based <- readxl::read_xlsx(paste0("01_data/raw/foreign_residents/", file_name),
                       col_names = FALSE) 
     
     colnames(df_based) <- c("prefecture_name", list_cols[["year_19_22"]])
@@ -123,8 +101,8 @@ create_df_foreign <- function(year_n, list_cols, list_prefecture_name, df_filena
       dplyr::mutate(prefecture_name = stringr::str_replace_all(prefecture_name, "府", "")) |> 
       dplyr::mutate(prefecture_name = stringr::str_replace_all(prefecture_name, "東京都", "東京"))
   } else if (year_n <= 2022) {
-
-    df_based <- readxl::read_xlsx(here::here("01_data", "raw", "foreign_residents", file_name),
+    file_name <- paste0(year_n, ".xlsx")
+    df_based <- readxl::read_xlsx(paste0("01_data/raw/foreign_residents/", file_name),
                                   col_names = FALSE) |> 
       dplyr::select(-1)
     

@@ -3,7 +3,7 @@ main <- function() {
   df_status <- read.csv(here::here("01_data", "intermediate", "foreign_status", "foreign_status.csv"), fileEncoding = "cp932") |> 
     dplyr::ungroup() |> 
     dplyr::filter(year >= 2010)
-  
+
   df_master <- add_log_variables(df_status) |> 
     dplyr::ungroup()
 
@@ -16,6 +16,7 @@ add_log_variables <- function(df_input) {
   
   df_based <- df_input |> 
     dplyr::group_by(prefecture_name) |> 
+    dplyr::arrange(prefecture_name, year) |>
     dplyr::mutate(
       ln_foreign        = log(total_foreign),
       lag_ln_foreign    = dplyr::lag(ln_foreign),
