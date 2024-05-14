@@ -38,12 +38,7 @@ main <- function() {
   # 2010 - 2021(Dec), 2022(Jun)
   list_year <- rev(seq(2010, 2022))
 
-  list_prefecture_name <- readxl::read_xls(here::here("01_data", "raw", "prefecture_code_name", "prefecture_data.xls")) |> 
-    dplyr::distinct(!!rlang::sym("都道府県名\n（漢字）")) |> 
-    dplyr::pull()
-
-  df_foreign <- purrr::map(list_year, create_df_foreign, list_cols,
-                           list_prefecture_name, df_filenames) |> 
+  df_foreign <- purrr::map(list_year, create_df_foreign, list_cols, df_filenames) |> 
     dplyr::bind_rows() |> 
     dplyr::mutate_all(~stringr::str_replace_all(., "-", "0")) |> 
     dplyr::mutate_at(dplyr::vars(-prefecture_name), as.numeric) |> 
@@ -58,7 +53,8 @@ main <- function() {
   write.csv(df_foreign, here::here("01_data", "intermediate", "foreign_status", "foreign_status.csv"), fileEncoding = "cp932", row.names = FALSE)
 }
 
-create_df_foreign <- function(year_n, list_cols, list_prefecture_name, df_filenames) {
+
+create_df_foreign <- function(year_n, list_cols, df_filenames) {
   print(year_n)
 
   file_name <- df_filenames |>
@@ -127,11 +123,12 @@ create_df_foreign <- function(year_n, list_cols, list_prefecture_name, df_filena
     df_based <- readxl::read_xlsx(here::here("01_data", "raw", "foreign_residents", file_name),
                                   col_names = FALSE) |> 
       dplyr::select(-1)
-    
+
     colnames(df_based) <- c("prefecture_name", list_cols[["year_19_22"]])
 
   df_based <- df_based |> 
-    dplyr::filter(prefecture_name %in% list_prefecture_name) |> 
+    dplyr::filter(stringr::str_detect(prefecture_name, "県|京都府|大阪府|東京都|北海道")) |> 
+    dplyr::filter(!stringr::str_detect(prefecture_name, "都道府県市区町村|山県市")) |> 
     dplyr::mutate(prefecture_name = stringr::str_replace_all(prefecture_name, "県", "")) |> 
     dplyr::mutate(prefecture_name = stringr::str_replace_all(prefecture_name, "府", "")) |> 
     dplyr::mutate(prefecture_name = stringr::str_replace_all(prefecture_name, "東京都", "東京"))
