@@ -9,8 +9,19 @@ rawデータは含まれていないため、下記を参考に、ダウンロ�
 
 
 ## 実行の流れ
-1. rawデータのダウンロード(データセクション参照)
-2. `06_report/admin.r`を実行
+1. `cd ~`で必要に応じてcurrent directoryを変更
+2. `git clone https://github.com/HirokiIto05/geographical-distribution.git`
+3. rawデータをダウンロードし、適切な場所に保存
+4. `renv::restore()`を実行し、必要なpackageをインストール
+5. `06_report/admin.r`を実行
+
+**dockerを使う場合**
+1. `cd ~`で必要に応じてcurrent directoryを変更
+2. `git clone https://github.com/HirokiIto05/geographical-distribution.git`
+3. `docker compose up -d`
+4. `http://localhost:8787/`に接続
+5. `renv::restore()`を実行し、必要なpackageをインストール
+6. `06_report/admin.r`を実行
 
 
 ## データ
