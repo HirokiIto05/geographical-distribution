@@ -1,0 +1,6 @@
+{
+    "name": "GeoDist", 
+    "build": {
+        "dockerfile": "../Dockerfile" // 相対パス表記
+    }
+}

@@ -1,0 +1,15 @@
+services:
+    rstudio:
+        build:
+            context: .
+        environment:
+            - TZ=Asia/Tokyo
+            - DISABLE_AUTH=true
+        volumes:
+            - .:/home/rstudio/work
+            - renv:/home/rstudio/.cache/R/renv
+        ports:
+            - "8787:8787"
+volumes:
+  renv:
+    external: true
