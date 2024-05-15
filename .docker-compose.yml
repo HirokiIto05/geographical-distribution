@@ -7,7 +7,7 @@ services:
             - DISABLE_AUTH=true
         volumes:
             - .:/home/rstudio/work
-            - renv:/home/rstudio/.cache/R/renv
+            # - renv:/home/rstudio/.cache/R/renv
         ports:
             - "8787:8787"
 volumes:
