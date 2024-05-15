@@ -18,10 +18,11 @@ rawデータは含まれていないため、下記を参考に、ダウンロ�
 **dockerを使う場合**
 1. `cd ~`で必要に応じてcurrent directoryを変更
 2. `git clone https://github.com/HirokiIto05/geographical-distribution.git`
-3. `docker compose up -d`
-4. `http://localhost:8787/`に接続
-5. `renv::restore()`を実行し、必要なpackageをインストール
-6. `06_report/admin.r`を実行
+3. rawデータをダウンロードし、適切な場所に保存
+4. `docker compose up -d`
+5. `http://localhost:8787/`に接続
+6. `renv::restore()`を実行し、必要なpackageをインストール
+7. `06_report/admin.r`を実行
 
 
 ## データ
