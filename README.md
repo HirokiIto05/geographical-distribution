@@ -5,20 +5,16 @@
 
 **※本文Section「3.1 国勢調査」に関連するコードは含まれません。**
 
-rawデータは含まれていないため、下記を参考に、ダウンロードしてください。
-
 
 ## 実行の流れ
-1. `cd ~`で必要に応じてcurrent directoryを変更
+1. 必要に応じてcurrent directoryを変更
 2. `git clone https://github.com/HirokiIto05/geographical-distribution.git`
-3. rawデータをダウンロードし、適切な場所に保存
 4. `renv::restore()`を実行し、必要なpackageをインストール
 5. `06_administration/execute.r`を実行
 
 **dockerを使う場合**
-1. `cd ~`で必要に応じてcurrent directoryを変更
+1. 必要に応じてcurrent directoryを変更
 2. `git clone https://github.com/HirokiIto05/geographical-distribution.git`
-3. rawデータをダウンロードし、適切な場所に保存
 4. `docker compose up -d`
 5. `http://localhost:8787/`に接続
 6. `renv::restore()`を実行し、必要なpackageをインストール
@@ -62,6 +58,3 @@ https://github.com/keisukekondokk/municipality-converter<br>
 **ディレクトリ**<br>
 
 `01_data/raw/municipality_converter`<br>
-
-**※ただし、市町村合併データは含まれている**<br>
-
