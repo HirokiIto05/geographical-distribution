@@ -1,10 +1,11 @@
 main <- function() {
 
-  df_raw <- read.xlsx(here("01_data", "raw", "german", "foreign", "country.xlsx"))
+  df_raw <- read.csv(here("01_data", "raw", "german", "foreign", "country.csv"))
 
   df <- adjust_cols(df_raw) |>
     merge_counties() |>
-    remove_unavailable_counties()
+    remove_unavailable_counties() |>
+    summarise_total()
 
   openxlsx::write.xlsx(
     df, 
@@ -21,9 +22,9 @@ adjust_cols <- function(df_raw) {
       county_id = 2,
       county_name = 3,
       country_name = 4,
-      population = 9
+      population = 7
     ) |>
-    fill(date, county_id, county_name, .direction = "down") |>
+    # fill(date, county_id, county_name, .direction = "down") |>
     mutate(
       county_id = as.numeric(county_id),
       date = lubridate::ymd(date),
@@ -59,8 +60,6 @@ merge_counties <- function(df) {
         .default = county_id
         )
     )
-
-
 }
 
 
@@ -87,4 +86,15 @@ remove_unavailable_counties <- function(df) {
       06633 # Kassel, Landkreis
     )
   )
+}
+
+
+summarise_total <- function(df) {
+
+  df_output <- df |>
+    summarise(
+      population = sum(population, na.rm = TRUE),
+      .by = c("year", "county_id", "country_name")
+    )
+
 }

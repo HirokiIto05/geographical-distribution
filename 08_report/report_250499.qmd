@@ -726,6 +726,35 @@ plot_line_chart_urban <- function(df_pref_urban, var_color) {
 
 ```
 
+```{r}
+# country classification
+df_country_class <- read.csv(here("01_data", "raw", "country_classification", "country_classification.csv")) |> 
+janitor::clean_names() |> 
+  select(iso_code, country_name, cls_income = x2019) |> 
+  mutate(
+    cls_income = case_when(
+      cls_income == "H" ~ "high",
+      cls_income == "UM" ~ "upper_middle",
+      cls_income == "LM" ~ "lower_middle",
+      cls_income == "L" ~ "low",
+      TRUE ~ cls_income
+    )
+  ) |>
+  mutate(
+    country_name = case_when(
+      country_name == "H" ~ "high",
+      country_name == "UM" ~ "upper_middle",
+      country_name == "LM" ~ "lower_middle",
+      country_name == "L" ~ "low",
+      TRUE ~ country_name
+    )
+  ) |>
+  mutate(
+    country_name = if_else(str_detect(country_name, "d'Ivoire"), "Cote d'Ivoire", country_name),
+    country_name = if_else(str_detect(country_name, "Tom and Pr_cipe"), "Sao Tome and Principe", country_name)
+    )
+```
+
 
 ### Japan
 
@@ -753,27 +782,72 @@ df_region <- df_pref_region |>
     .by = c(year, region)
   ) |>
   add_growth_rate("total", list_var_order = c("region", "year")) |>
-  rename(value = growth_rate) 
+  rename(value = growth_rate)
+
 
 plot_line_chart(df_region, region)
 ```
 
 
 ```{r}
-df_de_region <- read_xlsx(here("01_data", "intermediate", "german", "population_region.xlsx")) |>
+df_de_country <- read_xlsx(here("01_data", "intermediate", "german", "country_master.xlsx")) |>  
   dplyr::filter(
-    between(year, 2013, 2019),
-    region != "Total" 
-    ) |>  
-    mutate(
-      population = as.numeric(population)
-    ) |> 
-  summarise(
-    total = sum(population, na.rm = TRUE),
-    .by = c(year, region)
-  ) |>
-  add_growth_rate("total", list_var_order = c("region", "year")) |> 
-  rename(value = growth_rate) 
+    between(year, 2013, 2019)
+    ) |>
+  left_join(df_country_class, by = "country_name")
+  mutate(
+    region = case_when(
+      country_name == "Egypt" ~ "Egypt, Arab Rep.",
+      country_name == "Afghanistan, Republic of" ~ "Afghanistan",
+      country_name == "Bahamas" ~ "Bahamas, The",
+      country_name == "Bolivia, Plurinational State" ~ "Bolivia",
+      country_name == "Gambia" ~ "Gambia, The",
+      country_name == "Hong Kong" ~ "Hong Kong SAR, China",
+      country_name == "Iran, Islamic Republic of" ~ "Iran, Islamic Rep.",
+      country_name == "Yemen" ~ "Yemen, Rep.",
+      country_name == "Kyrgyzstan" ~ "Kyrgyz Republic",
+      country_name == "Congo, The Democratic Republic of the" ~ "Congo, Dem. Rep.",
+      country_name == "Congo, Republic of the" ~ "Congo, Rep.",
+      country_name == "Korea, Democratic People's Republic" ~ "Korea, Dem. Rep.",
+      country_name == "Korea, Republic of" ~ "Korea, Rep.",
+      country_name == "Lao People's Democratic Republic" ~ "Lao PDR",
+      country_name == "Macau" ~ "Macao SAR, China",
+      country_name == "Micronesia, Federated States of" ~ "Micronesia, Fed. Sts.",
+      country_name == "Moldova, Republic of" ~ "Moldova",
+      country_name == "Montenegro (since 2006-06-03)" ~ "Montenegro",
+      # country_name == "Palestinian Territories" ~ "",
+      country_name == "Serbia (incl. Kosovo) (2006-06-03 to 2008-02-16)" ~ "Serbia",
+      country_name == "" ~ "",
+      country_name == "" ~ "",
+      TRUE ~ "Other"
+    )
+  )
+  add_growth_rate("total", list_var_order = c("region", "year")) |>
+  rename(value = growth_rate)
+
+df_de_country |> View()
+# df_de_country |> dplyr::filter(str_detect(country_name, "until"))  |> 
+df_de_country |> dplyr::filter(is.na(cls_income)) |> distinct(country_name) |> View()
+df_de_country |> dplyr::filter(is.na(cls_income)) |> View()
+```
+
+
+```{r}
+df_de_country |> dplyr::filter(is.na(iso_code)) |>
+  dplyr::distinct(country_name) |> View()
+
+df_country_class |> 
+  dplyr::distinct(country_name)  |> View()
+
+list_a <- df_country_class |>
+  distinct(country_name) |>
+  pull(country_name)
+
+list_b <- df_de_country |> 
+  distinct(country_name) |>
+  pull(country_name)
+df_country_class |> View()
+setdiff(list_b, list_a)
 ```
 
 ```{r}
