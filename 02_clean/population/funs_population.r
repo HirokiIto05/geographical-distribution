@@ -1,5 +1,5 @@
-create_list_colname <- function() {
-  list_colname <- c(
+generate_list_cols <- function() {
+  list_cols <- c(
     "city_id",
     "prefecture_name",
     "city_name",
@@ -20,20 +20,42 @@ create_list_colname <- function() {
     "moving_out_others", # その他合計
     "decrease_total",
     "change", # 増減数
-    "change_rate",
     "natural", # 自然増減数
-    "natural_rate",
-    "social", # 社会増減数
-    "social_rate"
+    "social" # 社会増減数
   )
-  
-  return(list_colname)
-  
+
+  return(list_cols)
+
+}
+
+aggregate_population <- function(nationality_i, list_year, list_cols) {
+
+  purrr::map_dfr(
+    list_year,
+    read_population_year,
+    list_cols,
+    nationality = nationality_i
+    ) |>  
+  mutate(nationality = nationality_i, .after = city_name) 
+}
+
+
+change_cols_class <- function(df) {
+
+  non_numeric_variables <- c("prefecture_name", "city_name", "nationality")
+
+  df |>
+    mutate(across(-any_of(non_numeric_variables), as.numeric)) |>
+    mutate(
+      city_id = stringr::str_sub(city_id, start = 1, end = -2),
+      city_id = as.numeric(city_id)
+      ) |>
+    tidyr::drop_na(city_id) 
 }
 
 
 # aggregate for changing raw data to panel data
-aggregate_pop <- function(year_n, list_colname, nationality) {
+read_population_year <- function(year_n, list_colname, nationality) {
   print(year_n)
 
   if (nationality == "japanese") {
@@ -47,10 +69,9 @@ aggregate_pop <- function(year_n, list_colname, nationality) {
         'jumin_kihon_daicho',
         nationality,
         paste0(raw_name, ".xls"))
-      
-      new_df <- readxl::read_xls(file_name, col_names = FALSE) |>  
-        dplyr::select(-c(7, 8, 14, 15,
-                         22, 23)) 
+
+      new_df <- readxl::read_xls(file_name, col_names = FALSE) |>
+        select(-c(7, 8, 14, 15,22, 23, 27, 29, 31)) 
     } else if (year_n <= 2023) {
 
       file_name <- here::here(
@@ -61,7 +82,7 @@ aggregate_pop <- function(year_n, list_colname, nationality) {
         paste0(raw_name, ".xlsx"))
 
       new_df <- readxl::read_xlsx(file_name) |>  
-        dplyr::select(-c(7, 8, 14, 15, 22, 23)) 
+        select(-c(7, 8, 14, 15, 22, 23, 27, 29, 31))  
       
     } else if(year_n >= 2024) {
       raw_name <- paste0((year_n -2000), "nsjin")
@@ -73,7 +94,7 @@ aggregate_pop <- function(year_n, list_colname, nationality) {
         paste0(raw_name, '.xlsx'))
 
       new_df <- readxl::read_xlsx(file_name) |>  
-        dplyr::select(-c(7, 8, 14, 15, 22, 23)) 
+        select(-c(7, 8, 14, 15, 22, 23)) 
     }
     
     colnames(new_df) = list_colname
@@ -81,6 +102,7 @@ aggregate_pop <- function(year_n, list_colname, nationality) {
     raw_name <- paste0((year_n -2000), "11gsjin")
 
     if (year_n <= 2013) {
+
       file_name <- here::here(
         "01_data",
         'raw',
@@ -88,8 +110,8 @@ aggregate_pop <- function(year_n, list_colname, nationality) {
         nationality,
         paste0(raw_name, '.xls'))
 
-      new_df <-  readxl::read_xls(file_name, col_names = FALSE) |>
-        dplyr::select(-c(12, 13, 14, 21, 22)) 
+      new_df <-  readxl::read_xls(file_name, col_names = FALSE) |> 
+        select(-c(12, 13, 14, 21, 22, 26, 28, 30))  
 
     } else if (year_n <= 2020) {
 
@@ -99,9 +121,10 @@ aggregate_pop <- function(year_n, list_colname, nationality) {
         'jumin_kihon_daicho',
         nationality,
         paste0(raw_name, '.xls'))
-      
+
       new_df <- readxl::read_xls(file_name, col_names = FALSE) |> 
-        dplyr::select(-c(12, 13, 20, 21))
+        select(-c(12, 13, 20, 21, 25, 27, 29))
+
     } else if (year_n <= 2023) {
       file_name <- here::here(
         "01_data",
@@ -109,9 +132,9 @@ aggregate_pop <- function(year_n, list_colname, nationality) {
         'jumin_kihon_daicho',
         nationality,
         paste0(raw_name, '.xlsx'))
-      
-      new_df <- readxl::read_xlsx(file_name, col_names = FALSE) |> 
-        dplyr::select(-c(12, 13, 20, 21))
+
+      new_df <- readxl::read_xlsx(file_name, col_names = FALSE) |>  
+        select(-c(12, 13, 20, 21,  25, 27, 29))
       
     } else if(year_n >= 2024) {
       raw_name <- paste0((year_n -2000), "gsjin")
@@ -123,7 +146,7 @@ aggregate_pop <- function(year_n, list_colname, nationality) {
         paste0(raw_name, '.xlsx'))
 
       new_df <- readxl::read_xlsx(file_name, col_names = FALSE) |> 
-        dplyr::select(-c(12, 13, 20, 21))
+        select(-c(12, 13, 20, 21))
     }
     colnames(new_df) = list_colname
   } else if(nationality == "both") {
@@ -138,8 +161,10 @@ aggregate_pop <- function(year_n, list_colname, nationality) {
         nationality,
         paste0(raw_name, '.xls'))
       
-      new_df <- readxl::read_xls(file_name, col_names = FALSE)
+      new_df <- readxl::read_xls(file_name, col_names = FALSE) |> 
+        select(-c(21, 23, 25))
     } else if(year_n <= 2023) {
+
       file_name <- here::here(
         "01_data",
         'raw',
@@ -147,8 +172,10 @@ aggregate_pop <- function(year_n, list_colname, nationality) {
         nationality,
         paste0(raw_name, '.xlsx'))
       
-      new_df <- readxl::read_xlsx(file_name, col_names = FALSE)
+      new_df <- readxl::read_xlsx(file_name, col_names = FALSE) |> 
+        select(-c(21, 23, 25))
     } else if(year_n >= 2024) {
+
       raw_name <- paste0((year_n -2000), "ssjin")
       file_name <- here::here(
         "01_data",
@@ -157,25 +184,178 @@ aggregate_pop <- function(year_n, list_colname, nationality) {
         nationality,
         paste0(raw_name, '.xlsx'))
 
-      new_df <- readxl::read_xlsx(file_name, col_names = FALSE)
+      new_df <- readxl::read_xlsx(file_name, col_names = FALSE) |>
+      select(-c(21, 23, 25))
     }
   colnames(new_df) <- list_colname
   }
+
   output_df <- new_df |>
-    dplyr::mutate(year = year_n, .after = city_name) |> 
-    dplyr::slice(c(-1:-4)) |> 
-    dplyr::ungroup()
-  
+    mutate(year = year_n, .after = city_name) |> 
+    slice(c(-1:-4)) |> 
+    ungroup()
+
   return(output_df)
   
 }
 
+clean_population_data <- function(nationality_i) {
 
+  # 日本語の列名を英語に変換
+  list_colname <- generate_list_cols()
+  list_year <- seq(2013, 2022)
+
+  # aggregate_population(nationality_i, list_year, list_cols) |>
+  aggregate_population("japanese", list_year, list_cols) |>
+    change_cols_class()
+  
+}
+
+
+change_year <- function(df) {
+
+  df_output <- df |>
+    mutate(
+      year = as.numeric(year),
+      year = year - 1
+    )
+  
+  return(df_output)
+}
+
+
+
+
+
+# merge municipalities ----------------------------------------------------------------
+
+read_correspondent_table <- function() {
+
+    readxl::read_xlsx(
+      here("01_data", "raw", "municipality_converter", "municipality_converter_jp.xlsx"))
+
+}
+
+
+generate_list_id_2020 <- function(df) {
+
+  list_id <- read_correspondent_table() |> 
+    distinct(id_muni2020) |> 
+    pull()
+}
+
+
+extract_new_old_id <- function(id_i, df_merge_municipalities){
+
+  list_munis <- df_merge_municipalities |> 
+    dplyr::filter(id_muni2020 == id_i) |>
+    select(seq(2,10)) |> 
+    unlist() |>
+    unique() |>
+    na.omit()
+
+  tibble(
+    "id_2020" = id_i,
+    "id_all" = list_munis
+  )
+}
+
+
+#' Generate Municipality Merge Data Frame
+#'
+#' Creates a data frame mapping old and new municipality IDs based on 2020 base identifiers.
+#'
+#' @return A data frame with municipality ID correspondences.
+#'
+generate_df_merge_muni <- function(){
+
+  # read merge data frame
+  df_merge_municipalities <- read_correspondent_table()
+  # extract base id at 2020
+  list_id <- generate_list_id_2020()
+  # generate correspondent table
+  df_merge_id <- purrr::map_dfr(list_id, extract_new_old_id, df_merge_municipalities)
+
+  return(df_merge_id)
+}
+
+
+# Merge dataframes
+
+merge_dfs <- function(df_population, df_new_old_id) {
+
+  df_new_old_id |> 
+    left_join(df_population, join_by(id_all == city_id))  |>
+    rename(city_id = id_2020)
+
+}
+
+
+summarise_vars <- function(df_merged) {
+
+  list_vars <- setdiff(generate_list_cols(), c("prefecture_name", "city_name"))
+
+  df_merged |>
+    reframe(
+      across(any_of(list_vars), ~sum(., na.rm = TRUE)),
+      .by = c(year, city_id)
+    ) 
+}
+
+  
+
+generate_muni_pref_name <- function(df_merged, df_population) {
+
+  list_muni_id <- unique(df_merged$city_id)
+
+  df_population |>
+    dplyr::filter(
+      year == 2020, 
+      city_id %in% list_muni_id
+      ) |>
+      distinct(
+        city_id, 
+        city_name,
+        prefecture_name
+      )
+}
+
+
+add_muni_pref_name <- function(df_merged, df_population) {
+
+  df_muni_pref_name <- generate_muni_pref_name(df_merged, df_population)
+
+  df_merged |>
+    left_join(df_muni_pref_name, by = "city_id") |> 
+    relocate(c(city_name, prefecture_name), .after = city_id) |>
+    relocate(year, .after = prefecture_name)
+
+}
+
+
+#' Adjust Municipal Population Data
+#'
+#' Adjusts municipal population data by merging with ID mapping, summarizing variables,
+#' and adding municipal/prefectural names.
+#'
+#' @param df Population data frame
+#' @param df_new_old_id_mapping Municipal ID mapping data frame
+#' @return Adjusted population data frame
+adjust_muni_population <- function(df, df_new_old_id_mapping) {
+
+  df |>
+    merge_dfs(df_new_old_id_mapping) |> 
+    summarise_vars() |>
+    add_muni_pref_name(df) |>
+    dplyr::filter(!is.na(year)) 
+
+}
+
+# Add lag variables ----------------------------------------------------------------
 add_lag_variables <- function(df_input) {
   
   df_based <- df_input |>
-    dplyr::group_by(city_id) |>
-    dplyr::mutate(
+    mutate(
       lag_total = dplyr::lag(total),
       change_rate = change/dplyr::lag(total)*100,
       natural_rate = natural/dplyr::lag(total)*100,
@@ -185,12 +365,13 @@ add_lag_variables <- function(df_input) {
       lag_ln_total = dplyr::lag(ln_total),
       lag_ln_total_5 = dplyr::lag(ln_total, n = 5),
       ln_change_rate_total = ln_total - lag_ln_total,
-      ln_change_rate_total_5 = ln_total - lag_ln_total_5
+      ln_change_rate_total_5 = ln_total - lag_ln_total_5,
+      .by = city_id
     ) |> 
-    dplyr::select(
+    select(
       city_id,
-      # city_name,
-      # prefecture_name,
+      city_name,
+      prefecture_name,
       year,
       male,
       female,
@@ -220,157 +401,9 @@ add_lag_variables <- function(df_input) {
       lag_ln_total,
       lag_ln_total_5,
       ln_change_rate_total,
-      ln_change_rate_total_5,
-    ) |>
-    ungroup()
-  
+      ln_change_rate_total_5
+    )
+
   return(df_based)
   
 }
-
-
-change_year <- function(df) {
-
-  df_output <- df |>
-    dplyr::mutate(
-      year = as.numeric(year),
-      year = year - 1
-    )
-  
-  return(df_output)
-}
-
-
-generate_muni_mapping_table <- function() {
-  # ファイル読み込み（シート名が "Sheet1" の場合）
-  df_mapping_raw <- readxl::read_excel(here("01_data/raw/municipality_converter/municipality_converter_jp.xlsx"))
-
-  # 必要な列の選択（1980年〜2020年のID列と2020年ID）
-  id_cols <- grep("^id_muni", names(df_mapping_raw), value = TRUE)
-  id_cols <- setdiff(id_cols, "id_muni2020") # "id_muni2020"を重複しないよう除外
-  df_ids <- df_mapping_raw[, c("id_muni2020", id_cols)]
-
-  # ロング形式に変換
-  df_long <- df_ids %>%
-    pivot_longer(
-      cols = all_of(id_cols),
-      names_to = "year",
-      values_to = "other_id"
-    )
-
-  # 2020年IDと他の年のIDをマッピング、重複・NA除去、異なるIDのみ
-  df_mapping <- df_long %>%
-    dplyr::filter(!is.na(other_id)) %>%
-    dplyr::filter(id_muni2020 != other_id) %>%
-    distinct(id_muni2020, other_id) %>%
-    arrange(id_muni2020, other_id)
-  
-  return(df_mapping)
-
-}
-
-
-adjust_munis <- function(df) {
-
-  df_mapping <- generate_muni_mapping_table()
-
-  df |>
-    mutate(city_id = as.numeric(city_id)) |>
-    left_join(df_mapping, by = c("city_id" = "other_id")) |>
-    mutate(id_muni2020 = if_else(is.na(id_muni2020), city_id, id_muni2020))
-}
-
-
-sumamrise_new_munis <- function(df) {
-
-  list_vars <- c(
-    "male",
-    "female",
-    "total",
-    "household",
-    "moving_in_dom",
-    "moving_in_int",
-    "moving_in_total",
-    "birth",
-    "moving_in_others",
-    "increase_total",
-    "moving_out_dom",
-    "moving_out_int",
-    "moving_out_total",
-    "mortality",
-    "moving_out_others",
-    "decrease_total",
-    "change",
-    "natural",
-    "social"
-  )
-
-  df |>
-    dplyr::reframe(
-      dplyr::across(dplyr::any_of(list_vars), ~sum(., na.rm = TRUE)),
-      .by = c(year, id_muni2020)
-    ) |>
-    rename(city_id = id_muni2020)
-}
-
-
-extract_muni_2020 <- function(df) {
-
-  df_mapping_raw <- read_excel(here("01_data/raw/municipality_converter/municipality_converter_jp.xlsx"))
-
-  # Get all muni id existing in 2020
-  all_muni2020 <- unique(df_mapping_raw$id_muni2020)
-  
-  # Generate all combinations of years and municipality IDs
-  all_years <- df$year |> unique()
-  full_index <- expand.grid(city_id = all_muni2020, year = all_years)
-
-  # 欠損値を含めて結合（存在しない組はNA）
-  df_output <- full_index |>
-    left_join(df, by = c("city_id", "year")) |> 
-    arrange(city_id, year)
-
-  return(df_output)
-
-}
-
-
-generate_2020_names <- function() {
-
-  raw_name <- paste0((2020 -2000), "07nsjin")
-
-  df_2020 <- readxl::read_xls(here(
-        "01_data",
-        'raw',
-        'jumin_kihon_daicho',
-        "japanese",
-        paste0(raw_name, '.xls')),
-        col_names = FALSE) |>  
-      select(
-        city_id = 1,
-        city_name = 3,
-        prefecture_name = 2) |>
-    mutate(
-      city_id = stringr::str_sub(city_id, start = 1, end = -2),
-      city_id = as.numeric(city_id)
-      ) |>
-    tidyr::drop_na(city_id) 
-
-  return(df_2020)
-}
-
-
-add_city_pref_name <- function(df) {
-
-  df_2020 <- generate_2020_names()
-
-  df |>
-    left_join(df_2020, by = "city_id") |> 
-    select(
-      city_id, city_name, prefecture_name,
-      everything()
-    ) 
-
-
-}
-  
