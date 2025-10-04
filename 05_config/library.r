@@ -17,5 +17,9 @@ pacman::p_load(
     patchwork,
     cowplot,
     plyr,
-    broom
+    broom,
+    openxlsx
     )
+
+conflicted::conflict_prefer("here", "here")
+conflicted::conflict_prefer_all("dplyr", quiet = TRUE)

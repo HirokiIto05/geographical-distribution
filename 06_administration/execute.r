@@ -5,9 +5,7 @@ source(here::here("05_config", "library.r"))
 # Clean -----------------------------------------
 
 # 「住民基本台帳」関連分析
-source(here::here("02_clean", "population", "01_aggregate_pop.r")) # create panel data
-source(here::here("02_clean", "population", "02_muni_id_adjusted.r")) # adjust municipality id
-source(here::here("02_clean", "population", "03_master_pop.r")) 
+source(here::here("02_clean", "population", "population.r")) # create panel data
 
 # 「在留外国人統計」関連分析
 source(here::here("02_clean", "foreign_status", "01_aggregate_status.r"))
