@@ -1,7 +1,7 @@
  main <- function() {
   
   # read data -----------------------------------
-  df_master <- read.csv(here::here("01_data", "intermediate", "foreign_status", "master.csv"), fileEncoding = "cp932")
+  df_master <- read.csv(here::here("01_data", "intermediate", "foreign_status", "foreign_status.csv"), fileEncoding = "cp932")
   
   # estimate ------------------------------------
   model_high <- estimate_high(df_master)

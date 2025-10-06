@@ -1,7 +1,7 @@
 main <- function() {
   
   # read data -----------------------------------
-  df_master <- read.csv(here::here("01_data", "intermediate", "foreign_status", "master.csv"), fileEncoding = "cp932")
+  df_master <- read.csv(here::here("01_data", "intermediate", "foreign_status", "foreign_status.csv"), fileEncoding = "cp932")
 
   # estimates ------------------------------------
  
@@ -57,8 +57,6 @@ create_lm_kable <- function (model_input, title_n) {
   
 }
 
-df_input <- df_master
-df_input |> dplyr::filter(between(year, 2020, 2022)) |> View()
 
 lm_three_total <- function(df_input) {
   

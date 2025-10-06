@@ -1,6 +1,6 @@
 main <- function() {
   
-  df_master <- read.csv(here::here("01_data", "intermediate", "foreign_status", "master.csv"), fileEncoding = "cp932")
+  df_master <- read.csv(here::here("01_data", "intermediate", "foreign_status", "foreign_status.csv"), fileEncoding = "cp932")
 
   df_plot_based <- modify_dataset(df_master)
 

@@ -1,6 +1,6 @@
 main <- function() {
   
-  df_master <- read.csv(here::here("01_data", "intermediate", "foreign_status", "master.csv"), fileEncoding = "cp932")
+  df_master <- read.csv(here::here("01_data", "intermediate", "foreign_status", "foreign_status.csv"), fileEncoding = "cp932")
 
   # create plot -------------------------------------------------------------
   create_result(df_master)
@@ -58,7 +58,7 @@ main <- function() {
     results_lag_2019_h,
     results_lag_2022_h,
     ncol = 1, nrow = 3) 
-
+result_aggregated
   
   ggsave(result_aggregated,
          filename = here::here("04_output", "figures", "figure_8.png"),

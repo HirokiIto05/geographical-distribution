@@ -13,7 +13,7 @@ main <- function() {
 
   # 3) 対応表に基づいて人口を再集計
   df_population_adjusted_refactored <- adjust_muni_population(df_population, df_new_old_id_mapping)
-  
+
   # clean data ---------------------------------------------------------------------
   # read raw data
   # Japanese
