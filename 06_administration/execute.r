@@ -8,8 +8,7 @@ source(here::here("05_config", "library.r"))
 source(here::here("02_clean", "population", "population.r")) # create panel data
 
 # 「在留外国人統計」関連分析
-source(here::here("02_clean", "foreign_status", "01_aggregate_status.r"))
-source(here::here("02_clean", "foreign_status", "02_master_foreign.r"))
+source(here::here("02_clean", "foreign_status", "foreign_status.r"))
 
 # Analyze ---------------------------------------
 
