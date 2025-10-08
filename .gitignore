@@ -19,4 +19,13 @@
 # !*.gitkeep
 
 # ignore renv cache
+
+
+# ignore R markdown output files
+README_files/
+
+# Ignore environment and cache directories
 .renv/
+.cache/
+.local/
+.config/
