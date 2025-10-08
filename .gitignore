@@ -17,3 +17,14 @@
 # keep folder structure
 # !/00.cover/.gitkeep
 # !*.gitkeep
+# ignore renv cache
+
+
+# ignor
+README_files/
+
+# Ignore environment and cache directories
+.renv/
+.cache/
+.local/
+.config/
