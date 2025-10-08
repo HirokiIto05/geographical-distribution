@@ -17,3 +17,6 @@
 # keep folder structure
 # !/00.cover/.gitkeep
 # !*.gitkeep
+
+# ignore renv cache
+.renv/

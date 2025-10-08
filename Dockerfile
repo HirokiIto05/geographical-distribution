@@ -1,9 +1,14 @@
-FROM rocker/rstudio
+FROM rocker/rstudio:4.3.3
 
-RUN apt update && apt install -y
+RUN apt update && apt install -y 
 
 # R Package
-RUN R -e "install.packages(c('renv'))"
+RUN apt update && \
+    apt install -y  mecab mecab-ipadic-utf8 fonts-ipafont libmecab-dev && \
+    apt install -y  libcurl4-openssl-dev libssl-dev libxml2-dev libfontconfig1-dev
 
-# RUN cd /home/rstudio && mkdir .cache .cache/R .cache/R/renv && \
-#     chown rstudio:rstudio .cache .cache/R .cache/R/renv 
+RUN R -e "install.packages(c('renv', 'languageserver', 'httpgd'))"
+
+# Package Cahce & Permission
+RUN cd /home/rstudio && mkdir .cache && \
+    chown rstudio:rstudio .cache
