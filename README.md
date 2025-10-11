@@ -64,6 +64,7 @@
 **配置ディレクトリ**:
 ```
 01_data/raw/jumin_kihon_daicho/
+├── both/         # 全人口データ
 ├── japanese/     # 日本人人口データ
 └── overseas/     # 外国人人口データ
 ```
