@@ -11,9 +11,6 @@ main <- function() {
 
   df_new_old_id_mapping <- generate_df_merge_muni()
 
-  # 3) 対応表に基づいて人口を再集計
-  df_population_adjusted_refactored <- adjust_muni_population(df_population, df_new_old_id_mapping)
-
   # clean data ---------------------------------------------------------------------
   # read raw data
   # Japanese
@@ -29,12 +26,9 @@ main <- function() {
   df_both_adjusted <- adjust_muni_population(df_both_raw, df_new_old_id_mapping)
 
   # add lag variables
-  df_jp_master <- add_lag_variables(df_jp_adjusted) |>
-    add_city_pref_name()
-  df_for_master <- add_lag_variables(df_for_adjusted) |>
-    add_city_pref_name()
-  df_both_master <- add_lag_variables(df_both_adjusted) |>
-    add_city_pref_name()
+  df_jp_master <- add_lag_variables(df_jp_adjusted)
+  df_for_master <- add_lag_variables(df_for_adjusted)
+  df_both_master <- add_lag_variables(df_both_adjusted)
 
   # save -----------------------------------------------------------------
   write.csv(df_jp_master, here::here("01_data", "intermediate", "population", "japanese_master.csv"), fileEncoding = "cp932", row.names = FALSE)

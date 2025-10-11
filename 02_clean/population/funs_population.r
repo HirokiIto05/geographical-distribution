@@ -202,11 +202,10 @@ read_population_year <- function(year_n, list_colname, nationality) {
 clean_population_data <- function(nationality_i) {
 
   # 日本語の列名を英語に変換
-  list_colname <- generate_list_cols()
+  list_cols <- generate_list_cols()
   list_year <- seq(2013, 2022)
 
-  # aggregate_population(nationality_i, list_year, list_cols) |>
-  aggregate_population("japanese", list_year, list_cols) |>
+  aggregate_population(nationality_i, list_year, list_cols) |>
     change_cols_class()
   
 }

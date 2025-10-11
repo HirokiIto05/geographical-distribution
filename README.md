@@ -82,9 +82,9 @@
 
 **出典**: 近藤(2019), "[市町村合併を考慮した市区町村パネルデータの作成](https://www.rieti.go.jp/jp/publications/summary/19030013.html)"
 
-**データソース**: [GitHub - municipality-converter](https://github.com/keisukekondokk/municipality-converter)
+**データソース**: [GitHub - municipality-converter](https://keisukekondokk.github.io/data/)
 
-**取得ファイル**: `municipality-converter/data_converter/municipality_converter_jp.csv`
+**取得ファイル**: `6. Converter File (Data)/Download (Japanese)/Excel XLSX`
 
 **配置ディレクトリ**:
 ```
