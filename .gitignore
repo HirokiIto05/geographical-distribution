@@ -3,6 +3,7 @@
 
 # ignore all files in this directory
 99_other/
+01_data/raw/
 01_data/intermediate/
 04_output/
 
