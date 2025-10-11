@@ -42,3 +42,5 @@ main <- function() {
   write.csv(df_both_master, here::here("01_data", "intermediate", "population", "both_master.csv"), fileEncoding = "cp932", row.names = FALSE)
 
 }
+
+main()

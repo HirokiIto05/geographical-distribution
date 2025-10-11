@@ -676,6 +676,4 @@ add_log_variables <- function(df_input) {
   
 }
 
-
-
 main()

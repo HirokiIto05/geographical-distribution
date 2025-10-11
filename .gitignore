@@ -20,3 +20,6 @@
 
 # ignore renv cache
 .renv/
+.cache/
+.local/
+.config/

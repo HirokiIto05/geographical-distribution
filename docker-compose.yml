@@ -9,9 +9,7 @@ services:
             - RENV_PATHS_CACHE=/home/rstudio/.renv/cache
         volumes:
             # If you want to use renv cache from your host machine, uncomment and modify the following line
-            # - ~/Library/Caches/org.R-project.R/R/renv/cache:/home/rstudio/.renv/cache
+            - ~/Library/Caches/org.R-project.R/R/renv/cache:/home/rstudio/.renv/cache
             - .:/home/rstudio
         ports:
             - 8787:8787
-        # From .devcontainer/docker-compose.yml: keep the container running for devcontainer
-        command: sleep infinity
